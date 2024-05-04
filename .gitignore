@@ -1,3 +1,4 @@
 *.tsv
 *.json
 .DS_Store
+data/
