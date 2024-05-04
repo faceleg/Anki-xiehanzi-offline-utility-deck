@@ -1,7 +1,7 @@
 
 # Anki xiehanzi Offline Utility Deck
 
-This repository aims to semi-automate the creation of an Anki deck that includes all the necessary data files for xiehanzi to function fully offline. The utility is designed to enhance the use of xiehanzi, a tool for learning Chinese characters interactively within Anki.
+This repository is for generating the necessary data for the xiehanzi offline utility deck. If you prefer to download a pre-generated deck with all data included, please download the "Anki-xiehanzi-offline-utility-deck.apkg" from this repository.
 
 ## Overview
 
@@ -27,7 +27,7 @@ Execute the script to generate the TSV file and download the JSON data:
 ./generate-deck-tsv.sh
 ```
 
-This script will create a `data` directory containing the `xiehanzi_offline_data.tsv` file and a `json_files` directory with the necessary JSON files.
+This script will create a `data` directory containing the `xiehanzi_offline_data.tsv` file and a `json_files` directory with the necessary JSON files, along with a `front.html` file that includes image tags for each character.
 
 ### 2. Copy JSON Files into Anki's Collection Media Folder
 
@@ -42,90 +42,24 @@ Follow these steps to import the generated TSV file into Anki:
 - Choose the `xiehanzi_offline_data.tsv` file located in the `data` directory.
 - Import this file into a new or existing deck as required.
 
-### 4. Renaming the Deck (if necessary)
+### 4. Update the Card Template
+
+After importing, open the card template for the deck and paste the content of `front.html` into the front template of your card. This is essential for displaying the character data correctly. You can find more about editing card templates [here](https://docs.ankiweb.net/templates/intro.html).
+
+### 5. Renaming the Deck (if necessary)
 
 After importing, you may rename the deck to better reflect its purpose or to organize your study materials:
 
 - Click on the deck name in Anki.
 - Select `Rename` from the options.
 
-### 5. Update Deck Settings
+### 6. Update Deck Settings
 
 Since this deck is intended for utility purposes and not daily study, update the deck settings to set the daily new cards to 0 "for this deck only":
 
 - Select the deck.
 - Click on `Options`.
 - Adjust `New Cards/Day` to `0` under `Daily Limits`, ensuring you select "for this deck only".
-
-### 6. Further Configuration in Card Templates
-
-Further work will be required in the card configuration to fully integrate the utility into your decks. Since deck setups can vary widely, direct instructions cannot be provided. However, here are two code snippets that may be relevant depending on your setup:
-
-#### Code Snippet 1:
-```html
-<!-- Include xiehanzi.js -->
-<script src="_xiehanzi.js"></script>
-<div id="character-target-div"></div>
-<script type="text/javascript">
-  // Function to load character data from a given URL
-  function loadDataFromUrl(url, onComplete) {
-    var xhr = new XMLHttpRequest();
-
-    xhr.open("GET", url, true);
-
-    // Set up a callback function to handle the response
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          // Parse the JSON response
-          var charData = JSON.parse(xhr.responseText);
-          onComplete(charData);
-        } else {
-          // Log an error message if the request fails
-          printDebugMessage(
-            "Request failed with status: " + xhr.status + " for URL: " + url,
-          );
-        }
-      }
-    };
-
-    // Send the request
-    xhr.send();
-  }
-  var writer = HanziWriter.create('character-target-div', '{{Character}}', {
-    width: 200,
-    height: 200,
-    padding: 5,
-    strokeAnimationSpeed: 1,
-    delayBetweenStrokes: 200,
-    showCharacter: false,
-    /**
-     * Try to load the character locally, fallback to the default location if that fails
-     */ 
-    charDataLoader: function (character, onComplete) {
-        var initialUrl = "/_" + character + ".json";
-
-        // Attempt to load character data from the initial URL
-        loadDataFromUrl(
-            initialUrl,
-            function (charData) {
-                onComplete(charData);
-            },
-            function () {
-                // If the initial load fails, fallback to loading from another URL
-                var fallbackUrl =
-                    "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/" +
-                    character +
-                    ".json";
-                loadDataFromUrl(fallbackUrl, function (charData) {
-                    onComplete(charData);
-                });
-            },
-        );
-    }
-  });
-</script>
-```
 
 ## Additional Resources
 

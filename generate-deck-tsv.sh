@@ -4,10 +4,11 @@
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Define the data directory and output TSV file name
+# Define the data directory and output file names
 data_dir="./data"
 tsv_file="$data_dir/xiehanzi_offline_data.tsv"
 json_dir="$data_dir/json_files"
+html_file="$data_dir/front.html"
 
 # URL of the GitHub repository zip.
 repo_url="https://github.com/chanind/hanzi-writer-data/archive/refs/heads/master.zip"
@@ -28,6 +29,9 @@ echo "Extraction complete."
 # Ensure the data directory, JSON directory, and output directories exist.
 mkdir -p "$json_dir"
 [[ ! -f "$tsv_file" ]] && touch "$tsv_file"
+
+# Initialize the HTML file
+echo "" > "$html_file"
 
 # Find all matching .json files, excluding 'all.json'.
 files=($(find "$temp_dir/hanzi-writer-data-master/data" -type f -name "*.json" ! -name "all.json"))
@@ -53,12 +57,18 @@ for file in "${files[@]}"; do
     # Copy the file to the JSON directory with the prefix '_'.
     cp "$file" "$json_dir/_$filename.json"
 
+    # Add an <img> tag to the HTML file.
+    echo "<img src=\"_$filename.json\">" >> "$html_file"
+
     # Print progress bar.
     percent=$(( 100 * $current_file / $total_files ))
     printf "\rProgress: [%-50s] %d%%" $(printf '#%.0s' {1..$((percent / 2))}) $percent
 done
 
-echo "\nTSV file has been updated and files have been copied."
+# Finalize the HTML file
+echo "" >> "$html_file"
+
+echo "\nTSV and HTML files have been created, and JSON files have been copied."
 
 # Clean up the temporary directory.
 rm -rf "$temp_dir" "$temp_dir.zip"
